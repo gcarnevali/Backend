@@ -2,23 +2,23 @@ const fs = require('fs')
 let path = './archivos/products.json'
 
 class ProductManager {
-    constructor() {
+    constructor() {//Declaracion de constructor con un array vacio y una ruta hacia los archivos json
         this.products = [];
         this.path = path;
     }
 
 //MÉTODO PARA OBTENER PRODUCTOS------------------------------------------------------------------------------------------
 
-    async getProducts() {
-        if (fs.existsSync(this.path)) {
-            return JSON.parse(await fs.promises.readFile(this.path, 'utf-8'))
+    async getProducts() {//Si declaro async, utilizo await en el return
+        if (fs.existsSync(this.path)) {//Aca puede ir this.path o la ruta al archivo .json
+            return JSON.parse(await fs.promises.readFile(this.path, 'utf-8'))//JSON.parse(fs.promises.readFile("RUTA AL .JSON" y 'utf-8'))
         } else return []
     }
 
 //MÉTODO PARA AÑADIR PRODUCTOS-------------------------------------------------------------------------------------------
 
-    async addProduct(title, description, price, thumbnail, code, stock) {
-        let newProduct = { title, description, price, thumbnail, code, stock }
+    async addProduct(title, description, price, thumbnail, code, stock) {//Le paso los parametros al metodo para cuando necesite instanciarlo
+        let newProduct = { title, description, price, thumbnail, code, stock }//Declaracion de newProduct para trabajar el condicional
 
         if (this.products.length === 0) {
             newProduct.id = 1
@@ -26,8 +26,8 @@ class ProductManager {
             newProduct.id = this.products[this.products.length - 1].id + 1
         }
 
-        this.products.push(newProduct)
-        await fs.promises.writeFile(this.path, JSON.stringify(this.products))
+        this.products.push(newProduct)//Pushear newProduct al array products
+        await fs.promises.writeFile(this.path, JSON.stringify(this.products))//Escribir en el archivo .json los nuevos products 
     }
 
 //MÉTODO PARA OBTENER PRODUCTOS POR ID-----------------------------------------------------------------------------------
@@ -38,9 +38,9 @@ class ProductManager {
             return null;
         }
 
-        if (fs.existsSync(this.path)) {
-            const productsData = JSON.parse(await fs.promises.readFile(this.path, 'utf-8'));
-            const foundProduct = productsData.find(product => product.id === idProduct);
+        if (fs.existsSync(this.path)) {//Declaro que parametro voy a utilizar para el condicional. En este caso corroboro con fs si existe un archivo en this.path(ruta .json)
+            const productsData = JSON.parse(await fs.promises.readFile(this.path, 'utf-8'));//Convierto el archivo en formato objeto para leerlo 
+            const foundProduct = productsData.find(product => product.id === idProduct);//Filtro por ID
 
             if (foundProduct) {
                 console.log(`Producto encontrado con ID ${idProduct}.`);
@@ -58,7 +58,7 @@ class ProductManager {
 //MÉTODO PARA ACTUALIZAR PRODUCTOS---------------------------------------------------------------------------------------
 
     async updateProducts(idProduct, newStock) {
-        let indexToUpdate = this.products.findIndex(product => product.id === idProduct);
+        let indexToUpdate = this.products.findIndex(product => product.id === idProduct);//Instancio una variable que me permite seleccionar un producto a traves de su id con this.products
 
         if (indexToUpdate === -1) {
             console.log(`El producto con ID ${idProduct} no existe.`);

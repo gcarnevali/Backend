@@ -50,9 +50,7 @@ app.get('/products/:pid', (req, res) => {
 
             const productId = req.params.pid; //Obtener el pId de los parametros de ruta
 
-            console.log("Product ID from URL:", productId);
-
-            console.log(typeof productId)
+            console.log(typeof productId)//Siemore declarar antes de la comparacion para saber que tipo de dato estamos manejando
             const productoFiltrado = products.find(p => p.id === parseInt(productId));//Asi se declara una variable para filtrar por id
 
             if (productoFiltrado) {
