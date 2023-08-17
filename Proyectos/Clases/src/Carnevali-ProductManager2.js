@@ -112,18 +112,14 @@ const entorno = async () => {
 
     await manager.addProduct('Producto1', 'Lorem', 100, '/img', 1, 5)
     await manager.addProduct('Producto2', 'Lorem Ipsum ', 150, '/img2', 2, 5)
+    await manager.addProduct('Producto3', 'Lorem Ipsum Lorem', 200, '/img', 3, 5)
+    await manager.addProduct('Producto4', 'Lorem Ipsum Lorem Ipsum', 300, '/img2', 4, 5)
 
     await manager.getProducts()
 
-    //await manager.getProductsById(1)
-    //manager.getProductsById(3)
-
-    //manager.updateProducts(1, 10)
-    //manager.getProductsById(1)
-
-    //await manager.deleteProduct(2)
 
 }
 
-//EJECUCIÓN DEL PROGRAMA-------------------------------------------------------------------------------------------------
-entorno()
+//entorno()
+
+//export default ProductManager

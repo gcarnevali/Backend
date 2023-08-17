@@ -4,7 +4,7 @@
 }*/
 let array = [1, 2, 3, 4, 5] 
 
-function miMap(array[], callback){
+/*function miMap(array[], callback){
 
     let arraySalida=[]
     
@@ -16,4 +16,4 @@ function miMap(array[], callback){
     return arraySalida
 }
 
-miMap(array, numero=>2*numero)
+miMap(array, numero=>2*numero)*/

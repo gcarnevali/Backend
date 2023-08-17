@@ -1,11 +1,1 @@
-[
-  {
-    "title": "Producto1",
-    "description": "Lorem",
-    "price": 100,
-    "thumbnail": "/img",
-    "code": 1,
-    "stock": 5,
-    "id": 1
-  }
-]
+[{"title":"Producto1","description":"Lorem","price":100,"thumbnail":"/img","code":1,"stock":5,"id":1},{"title":"Producto2","description":"Lorem Ipsum ","price":150,"thumbnail":"/img2","code":2,"stock":5,"id":2},{"title":"Producto3","description":"Lorem Ipsum Lorem","price":200,"thumbnail":"/img","code":3,"stock":5,"id":3},{"title":"Producto4","description":"Lorem Ipsum Lorem Ipsum","price":300,"thumbnail":"/img2","code":4,"stock":5,"id":4}]
