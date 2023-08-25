@@ -1,1 +1,58 @@
-[{"title":"Producto1","description":"Lorem","price":100,"thumbnail":"/img","code":1,"stock":5,"id":1},{"title":"Producto2","description":"Lorem Ipsum ","price":150,"thumbnail":"/img2","code":2,"stock":5,"id":2},{"title":"Producto3","description":"Lorem Ipsum Lorem","price":200,"thumbnail":"/img","code":3,"stock":5,"id":3},{"title":"Producto4","description":"Lorem Ipsum Lorem Ipsum","price":300,"thumbnail":"/img2","code":4,"stock":5,"id":4}]
+[
+  {
+    "title": "Producto 1",
+    "description": "Lorem",
+    "code": "1",
+    "price": 100,
+    "status": true,
+    "stock": 10,
+    "category": "Numeros Impares",
+    "thumbnails": [
+      "/img1.jpg",
+      "/img2.jpg"
+    ],
+    "id": 1
+  },
+  {
+    "title": "Producto 2",
+    "description": "Lorem Ipsum",
+    "code": "2",
+    "price": 150,
+    "status": true,
+    "stock": 10,
+    "category": "Numeros Pares",
+    "thumbnails": [
+      "/img3.jpg",
+      "/img4.jpg"
+    ],
+    "id": 2
+  },
+  {
+    "title": "Producto 3",
+    "description": "Lorem Ipsum Lorem",
+    "code": "3",
+    "price": 200,
+    "status": true,
+    "stock": 10,
+    "category": "Numeros Impares",
+    "thumbnails": [
+      "/img5.jpg",
+      "/img6.jpg"
+    ],
+    "id": 3
+  },
+  {
+    "title": "Producto 4",
+    "description": "Lorem Ipsum Lorem Ipsum",
+    "code": "4",
+    "price": 250,
+    "status": true,
+    "stock": 10,
+    "category": "Numeros Pares",
+    "thumbnails": [
+      "/img7.jpg",
+      "/img8.jpg"
+    ],
+    "id": 4
+  }
+]
