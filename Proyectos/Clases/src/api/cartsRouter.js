@@ -81,6 +81,5 @@ cartsRouter.post('/:cid/:pid', (req, res) => {
 });
 
 
-// Implementa más rutas para carritos aquí
 
 module.exports = cartsRouter;
