@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos en Tiempo Real</title>
+</head>
+<body>
+    <h1>Productos en Tiempo Real</h1>
+    <ul id="product-list">
+        {{#each products}}
+        <li>
+            <h2>{{title}}</h2>
+            <p>{{description}}</p>
+            <p>Precio: ${{price}}</p>
+            <!-- Agrega más campos aquí según tus necesidades -->
+        </li>
+        {{/each}}
+    </ul>
+
+    <script>
+        // Agrega código JavaScript aquí para manejar WebSockets y actualizar la lista de productos en tiempo real
+    </script>
+</body>
+</html>
+ <script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io(); // Establecer conexión WebSocket
+
+    socket.on('updateProducts', (products) => {
+        // Función para actualizar la lista de productos en la vista
+        function updateProductList(products) {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = ''; // Limpiar la lista actual
+
+            products.forEach((product) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <h2>${product.title}</h2>
+                    <p>${product.description}</p>
+                    <p>Precio: $${product.price}</p>
+                    <!-- Agrega más campos aquí según tus necesidades -->
+                `;
+
+                productList.appendChild(listItem);
+            });
+        }
+
+        updateProductList(products); // Llamar a la función para actualizar la lista
+    });
+</script>

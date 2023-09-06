@@ -23,7 +23,7 @@ productsRouter.get('/', (req, res) => {
     const productsData = fs.readFileSync(productsFilePath, 'utf8');
     const products = JSON.parse(productsData);
 
-    res.json(products);
+    res.render('home', { products })
 });
 
 // Ruta GET '/:pid'
