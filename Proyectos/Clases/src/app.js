@@ -1,76 +1,69 @@
-const productsRouter = require('./api/productsRouter')
-const cartsRouter = require('./api/cartsRouter')
-
+const express = require('express'); 
 const exphbs = require('express-handlebars');
+const http = require('http');
+const io = require('socket.io');
+const fs = require('fs'); 
 
-app.engine('handlebars', exphbs());
+const productsRouter = require('./api/productsRouter');
+const cartsRouter = require('./api/cartsRouter');
+
+const PORT = 8080;
+
+const app = express(); 
+
+// Configura el motor de vistas Handlebars
+app.engine('handlebars', exphbs.engine());
 app.set('view engine', 'handlebars');
 
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+// Crea un servidor HTTP y WebSocket
+const server = http.createServer(app);
+const socketIO = io(server);
 
+// Función para obtener los productos actualizados desde el archivo products.json
 function getUpdatedProducts() {
     try {
-
         const productsData = fs.readFileSync('C:/Users/gcarn/Documents/Backend/ProyectoClases/archivos/products.json', 'utf8');
-
-        // Parsea los datos JSON en un objeto JavaScript
         const products = JSON.parse(productsData);
-
         return products;
     } catch (error) {
         console.error('Error al leer el archivo products.json:', error);
-        return []; // Devuelve un array vacío en caso de error o archivo no encontrado
+        return [];
     }
 }
 
+// Función para enviar productos actualizados a través de WebSocket
 function sendUpdatedProducts() {
-
-
-    io.sockets.emit('updateProducts', updatedProducts);
+    const updatedProducts = getUpdatedProducts();
+    socketIO.sockets.emit('updateProducts', updatedProducts);
 }
 
-io.on('connection', (socket) => {
+// Configura WebSocket
+socketIO.on('connection', (socket) => {
     console.log('Usuario conectado');
 });
 
+// Rutas para productos y carritos
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+
+// Ruta POST para productos
 app.post('/api/products', (req, res) => {
-
     const updatedProducts = getUpdatedProducts();
-
-
     sendUpdatedProducts(updatedProducts);
+    res.sendStatus(200); // Envía una respuesta exitosa (código 200)
+});
+
+// Ruta DELETE para productos
+app.delete('/api/products/:productId', (req, res) => {
+    const updatedProducts = getUpdatedProducts();
+    sendUpdatedProducts(updatedProducts);
+    res.sendStatus(200); // Envía una respuesta exitosa (código 200)
 });
 
 
-app.delete('/api/products/:productId', (req, res) => {
-
-    const updatedProducts = getUpdatedProducts();
-
-
-    sendUpdatedProducts(updatedProducts);
-})
-
-
-http.listen(PORT, () => {
+// Inicia el servidor HTTP
+server.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
-
-
-const express = require('express')//Paso 3 importar liberia express, declarar puerto, e instanciar variable entorno
-const PORT = 8080
-const app = express()
-
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-
-app.use('/api/products', productsRouter)
-app.use('/api/carts', cartsRouter)
-
-app.listen(PORT, () => {
-    console.log(`Corriendo en ${PORT}`)
-})
-
-
-
-
