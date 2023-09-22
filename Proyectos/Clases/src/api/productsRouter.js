@@ -1,30 +1,25 @@
 const fs = require('fs');
 const path = require('path');
 const productsFilePath = path.join('C:/Users/gcarn/Documents/Backend/Proyectos/Clases/archivos/products.json');
+const Product = require('../../dao/mongodb/productsModel')
 
 const express = require('express');
 const productsRouter = express.Router();
 
-let products = [] 
 
-// Función para generar un nuevo ID único
-function generateUniqueId(products) {
-    const existingIds = products.map(product => product.id);
-    let newId = Math.max(...existingIds) + 1;
-    while (existingIds.includes(newId)) {
-        newId++;
+// Ruta para obtener todos los productos
+productsRouter.get('/', async (req, res) => {
+    try {
+      const products = await Product.find(); // Utiliza el método .find() del modelo para obtener todos los productos
+      res.json(products);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al obtener los productos' });
     }
-    return newId;
-}
 
-// Ruta raíz GET '/'
-productsRouter.get('/', (req, res) => {
-    // Leer los datos del archivo products.json
-    const productsData = fs.readFileSync(productsFilePath, 'utf8');
-    const products = JSON.parse(productsData);
+    /*res.render('home', { products })*/
+  });
 
-    res.render('home', { products })
-});
 
 // Ruta GET '/:pid'
 productsRouter.get('/:pid', (req, res) => {
@@ -38,22 +33,17 @@ productsRouter.get('/:pid', (req, res) => {
 });
 
 // Ruta raíz POST '/'
-productsRouter.post('/', (req, res) => {
+productsRouter.post('/', async (req, res) => {
     try {
         const newProduct = req.body;
 
-        // Leer los datos del archivo products.json
-        const productsData = fs.readFileSync(productsFilePath, 'utf8');
-        products = JSON.parse(productsData); // Cargar los datos en la variable products
+        // Crea un nuevo producto utilizando el modelo de MongoDB
+        const product = new Product(newProduct);
 
-        newProduct.id = generateUniqueId(products);
-        products.push(newProduct);
+        // Guarda el producto en la base de datos
+        await product.save();
 
-        // Escribir la matriz actualizada de productos en el archivo products.json
-        const updatedProductsData = JSON.stringify(products, null, 2);
-        fs.writeFileSync(productsFilePath, updatedProductsData);
-
-        res.status(201).json(newProduct); // Devolver el producto recién creado con código de estado 201 (Creado)
+        res.status(201).json(product); // Devolver el producto recién creado con código de estado 201 (Creado)
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Error al crear el producto' });
@@ -61,24 +51,18 @@ productsRouter.post('/', (req, res) => {
 });
 
 
+
 // Ruta PUT '/:pid'
-productsRouter.put('/:pid', (req, res) => {
+productsRouter.put('/:pid', async (req, res) => {
     try {
-        const productId = parseInt(req.params.pid);
+        const productId = req.params.pid;
         const updatedProduct = req.body;
 
-        const productsData = fs.readFileSync(productsFilePath, 'utf8');
-        let products = JSON.parse(productsData);
+        // Busca y actualiza el producto en la base de datos utilizando el modelo de MongoDB
+        const product = await Product.findByIdAndUpdate(productId, updatedProduct, { new: true });
 
-        const existingProduct = products.find(p => p.id === productId);
-        if (existingProduct) {
-            // Mantener el ID original y actualizar los campos enviados desde el body
-            Object.assign(existingProduct, updatedProduct);
-
-            const updatedProductsData = JSON.stringify(products, null, 2);
-            fs.writeFileSync(productsFilePath, updatedProductsData);
-
-            res.json(existingProduct);
+        if (product) {
+            res.json(product);
         } else {
             res.status(404).json({ message: 'Producto no encontrado' });
         }
@@ -88,21 +72,16 @@ productsRouter.put('/:pid', (req, res) => {
     }
 });
 
+
 // Ruta DELETE '/:pid'
-productsRouter.delete('/:pid', (req, res) => {
+productsRouter.delete('/:pid', async (req, res) => {
     try {
-        const productId = parseInt(req.params.pid);
+        const productId = req.params.pid;
 
-        const productsData = fs.readFileSync(productsFilePath, 'utf8');
-        let products = JSON.parse(productsData);
+        // Elimina el producto de la base de datos utilizando el modelo de MongoDB
+        const deletedProduct = await Product.findByIdAndRemove(productId);
 
-        const productIndex = products.findIndex(p => p.id === productId);
-        if (productIndex !== -1) {
-            const deletedProduct = products.splice(productIndex, 1)[0];
-
-            const updatedProductsData = JSON.stringify(products, null, 2);
-            fs.writeFileSync(productsFilePath, updatedProductsData);
-
+        if (deletedProduct) {
             res.json(deletedProduct);
         } else {
             res.status(404).json({ message: 'Producto no encontrado' });
@@ -111,7 +90,12 @@ productsRouter.delete('/:pid', (req, res) => {
         console.error(err);
         res.status(500).json({ message: 'Error al eliminar el producto' });
     }
+
+
+
 });
+
+
 
 
 

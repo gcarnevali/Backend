@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+    <h1>Chat</h1>
+    <div id="chat">
+        <div id="messages">
+            <!-- Aquí se mostrarán los mensajes -->
+        </div>
+        <input type="text" id="messageInput" placeholder="Escribe un mensaje...">
+        <button id="sendButton">Enviar</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io(); // Conéctate al servidor Socket.IO
+
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const messagesDiv = document.getElementById('messages');
+
+// Escucha el evento 'chatMessage' para recibir mensajes del servidor
+socket.on('chatMessage', (message) => {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = `${message.user}: ${message.message}`;
+    messagesDiv.appendChild(messageElement);
+});
+
+// Maneja el evento clic del botón "Enviar"
+sendButton.addEventListener('click', () => {
+    const message = messageInput.value;
+    const user = 'CorreoDelUsuario'; // Reemplaza con el correo real del usuario
+
+    // Envia el mensaje al servidor para almacenarlo en MongoDB
+    socket.emit('chatMessage', { user, message });
+
+    // Limpia el campo de entrada
+    messageInput.value = '';
+});
+
+    </script>
+</body>
+</html>
