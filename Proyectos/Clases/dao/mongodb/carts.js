@@ -14,10 +14,6 @@ const cartSchema = new mongoose.Schema({
       quantity: Number, // Cantidad de productos del mismo tipo en el carrito
     },
   ],
-  createdAt: {
-    type: Date,
-    default: Date.now, // Establece la fecha de creación automáticamente
-  },
 });
 
 const Cart = mongoose.model('Cart', cartSchema);

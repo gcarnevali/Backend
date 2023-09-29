@@ -1,0 +1,11 @@
+<!-- En products-list.handlebars -->
+<h1>Lista de Productos</h1>
+
+{{#each products}}
+  <div class="product">
+    <h2>{{title}}</h2>
+    <p>Categoría: {{category}}</p>
+    <p>Precio: ${{price}}</p>
+    <a href="/products/{{_id}}">Ver detalles</a>
+  </div>
+{{/each}}
