@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const productsFilePath = path.join('C:/Users/gcarn/Documents/Backend/Proyectos/Clases/archivos/products.json');
 const Product = require('../../dao/mongodb/productsModel')
+const mongoosePaginate = require('mongoose-paginate-v2');
+
 
 const express = require('express');
 const productsRouter = express.Router();

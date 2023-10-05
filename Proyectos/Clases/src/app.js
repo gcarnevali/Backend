@@ -43,6 +43,14 @@ app.get('/chat', (req, res) => {
 const server = http.createServer(app);
 const socketIO = io(server);
 
+const session = require('express-session');
+
+app.use(session({
+  secret: 'tu_secreto_aqui',
+  resave: false,
+  saveUninitialized: true,
+}));
+
 // Configura WebSocket
 socketIO.on('connection', (socket) => {
     console.log('Usuario conectado');
