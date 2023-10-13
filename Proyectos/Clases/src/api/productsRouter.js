@@ -3,37 +3,57 @@ const path = require('path');
 const productsFilePath = path.join('C:/Users/gcarn/Documents/Backend/Proyectos/Clases/archivos/products.json');
 const Product = require('../../dao/mongodb/productsModel')
 const mongoosePaginate = require('mongoose-paginate-v2');
-
+const expresSession = require('express-session')
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
 
 const express = require('express');
 const productsRouter = express.Router();
 
-Product.plugin(mongoosePaginate)
+// Middleware para proteger rutas con Passport
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+}
 
-// Ruta para mostrar la lista de productos
-router.get('/', (req, res) => {
-    // Obtén la lista de productos desde tu base de datos o de donde estén almacenados
-    const products = [{/* ... */}, {/* ... */}, {/* ... */}]; // Reemplaza con tus datos reales
-  
-    // Renderiza la vista de lista de productos y pasa los productos como contexto
-    res.render('products-list', { products });
-  });
-  
-  // Ruta para mostrar los detalles de un producto individual
-  router.get('/:productId', (req, res) => {
-    const productId = req.params.productId;
-  
-    // Obtén los detalles del producto con el ID proporcionado desde tu base de datos
-    const product = {/* ... */}; // Reemplaza con los datos reales del producto
-  
-    // Renderiza la vista de detalles de producto y pasa el producto como contexto
-    res.render('product-details', { product });
-})
+// Ruta para el dashboard (protegida por el middleware)
+productsRouter.get('/dashboard', ensureAuthenticated, (req, res) => {
+    res.render('dashboard');
+});
 
-// Ruta para obtener todos los productos
+
+// Ruta para inicio de sesión (usando estrategia local)
+productsRouter.post('/login', passport.authenticate('local', {
+    successRedirect: '/dashboard',
+    failureRedirect: '/login',
+    failureFlash: true // Puedes usar flash messages para mensajes de error
+}));
+
+// Ruta para autenticación de GitHub
+productsRouter.get('/auth/github', passport.authenticate('github'));
+
+// Ruta de callback para autenticación de GitHub
+productsRouter.get('/auth/github/callback',
+    passport.authenticate('github', { successRedirect: '/dashboard', failureRedirect: '/login' })
+);
+
+// Serialización y deserialización de usuarios (típico para Passport)
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+    // Aquí debes buscar al usuario por su ID en la base de datos y pasar el usuario a través de "done".
+    User.findById(id, function(err, user) {
+        done(err, user);
+    });
+});
+// Ruta para obtener todos los productos paginados
 productsRouter.get('/', async (req, res) => {
     try {
-        // Parámetros de la consulta
         const { page = 1, limit = 10, sort = '', query = '' } = req.query;
 
         // Opciones de paginación y ordenamiento
@@ -43,10 +63,10 @@ productsRouter.get('/', async (req, res) => {
             sort: sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : null,
         };
 
-        // Filtros de búsqueda (si se proporciona un query)
+        // Filtros de búsqueda
         const filters = query ? { title: { $regex: query, $options: 'i' } } : {};
 
-        // Utiliza la función `paginate` proporcionada por `mongoose-paginate-v2`
+        // Utiliza la función `paginate` 
         const result = await Product.paginate(filters, options);
 
         // Construye la respuesta con el formato especificado
@@ -70,6 +90,24 @@ productsRouter.get('/', async (req, res) => {
 });
 
 
+productsRouter.get('/:productId', async (req, res) => {
+    try {
+        const productId = req.params.productId;
+
+        // Realiza una consulta a la base de datos MongoDB para obtener el producto por ID
+        const product = await Product.findById(productId);
+
+        if (product) {
+            // Renderiza la vista de detalles de producto y pasa el producto como contexto
+            res.render('product-details', { product });
+        } else {
+            res.status(404).json({ message: 'Producto no encontrado' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener los detalles del producto' });
+    }
+});
 
 // Ruta GET '/:pid'
 productsRouter.get('/:pid', (req, res) => {
