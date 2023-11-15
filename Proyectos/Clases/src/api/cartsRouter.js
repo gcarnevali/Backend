@@ -2,12 +2,74 @@ const fs = require('fs');
 const path = require('path');
 const cartsFilePath = path.join('C:/Users/gcarn/Documents/Backend/Proyectos/Clases/dao/filesystem/products.json');
 const Cart = require('../../dao/mongodb/carts'); // Importa el modelo de carritos de MongoDB
-
+const TicketService = require('../../services/ticketService');
 
 const express = require('express');
 const cartsRouter = express.Router();
 
 let carts = [];
+
+// Define la ruta
+cartsRouter.post('/:cid/purchase', async (req, res) => {
+    try {
+      const cartId = req.params.cid;
+      const cart = await Cart.findById(cartId).populate('items.product');
+  
+      if (!cart) {
+        return res.status(404).json({ message: 'Carrito no encontrado' });
+      }
+  
+      // Inicializa un array para almacenar los productos que no se pudieron procesar
+      const productsNotProcessed = [];
+  
+      // Itera sobre los productos en el carrito
+      for (const item of cart.items) {
+        const product = item.product;
+        const quantityToPurchase = item.quantity;
+  
+        // Verifica si hay suficiente stock para la cantidad deseada
+        if (product.stock >= quantityToPurchase) {
+          // Resta la cantidad comprada del stock del producto
+          product.stock -= quantityToPurchase;
+          await product.save();
+  
+          // Crea un ticket con los detalles de la compra
+          const ticketData = {
+            productId: product._id,
+            productName: product.name,
+            quantity: quantityToPurchase,
+            price: product.price,
+            total: quantityToPurchase * product.price,
+          };
+  
+          // Utiliza el servicio de Tickets para generar el ticket
+          await TicketService.createTicket(ticketData);
+  
+          // Elimina el producto del carrito
+          cart.items = cart.items.filter((i) => i.product !== product);
+        } else {
+          // Si no hay suficiente stock, agrega el ID del producto al array de no procesados
+          productsNotProcessed.push(product._id);
+        }
+      }
+  
+      // Actualiza el estado del carrito y asocia el ticket si hay productos procesados
+      if (cart.items.length > 0) {
+        cart.status = 'completed';
+        cart.ticket = /* Asigna el ID del ticket creado */
+        await cart.save();
+      } else {
+        // Si no hay productos procesados, actualiza el estado del carrito sin completar la compra
+        cart.status = 'failed';
+        await cart.save();
+      }
+  
+      res.json({ message: 'Compra completada', productsNotProcessed });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al procesar la compra' });
+    }
+  });
 
 // Ruta raíz POST '/'
 cartsRouter.post('/', async (req, res) => {

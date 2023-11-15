@@ -1,6 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User'); // Reemplaza con la ubicación de tu modelo de usuario
+const userDTO = require('../../dao/userDTO')
+
+router.get('/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const user = await userService.getUserById(userId);
+    res.json(user);
+});
+
+// Otras rutas y lógica relacionada con usuarios
+module.exports = router;
+
 
 router.post('/register', async (req, res) => {
     try {
@@ -50,6 +61,25 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/current', async (req, res) => {
+    try {
+        // Obtén el usuario actual desde la sesión o cualquier mecanismo de autenticación que estés utilizando
+        const currentUser = req.user; // Asegúrate de ajustar esto según tu implementación
+
+        if (!currentUser) {
+            return res.status(401).json({ message: 'No hay usuario autenticado' });
+        }
+
+        // Crea un DTO del usuario con la información necesaria
+        const userDto = new UserDto(currentUser);
+
+        res.json(userDto);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener el usuario actual' });
+    }
+});
+
 router.get('/logout', (req, res) => {
     // Cierra la sesión
     req.session.destroy((err) => {
@@ -61,4 +91,6 @@ router.get('/logout', (req, res) => {
         }
     });
 });
+
+
 module.exports = router;

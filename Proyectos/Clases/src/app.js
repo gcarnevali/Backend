@@ -12,7 +12,13 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session')
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
+const daoFactory = require('./dao/daoFactory');
+const argv = require('yargs').argv;
+const express = require('express');
+const userService = require('./services/userService');
 
+const daoType = argv.dao || 'mongo'; // Obtén el tipo de DAO desde la línea de comandos o utiliza un valor predeterminado
+const userDAO = daoFactory.createDAO(daoType);
 
 passport.use(new LocalStrategy(
   function (username, password, done) {
@@ -187,6 +193,12 @@ app.put('/api/products/:productId', async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Error al actualizar el producto' });
   }
+});
+
+app.get('/users/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const user = await userService.getUserById(userId);
+  res.json(user);
 });
 
 // Inicia el servidor HTTP

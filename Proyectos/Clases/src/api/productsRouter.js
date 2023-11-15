@@ -7,6 +7,7 @@ const expresSession = require('express-session')
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
+const { isAdmin, isUser } = require('../middleware/authMiddleware');
 
 const express = require('express');
 const productsRouter = express.Router();
@@ -180,6 +181,44 @@ productsRouter.delete('/:pid', async (req, res) => {
     }
 
 
+});
+
+
+productsRouter.post('/', isAdmin, async (req, res) => {
+    try {
+        // Lógica para crear un producto
+        const newProduct = req.body;
+        // Verificar si el usuario actual tiene permisos de administrador
+        // Hacer la creación del producto
+        res.status(201).json({ message: 'Producto creado exitosamente' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error al crear el producto' });
+    }
+});
+
+productsRouter.put('/:productId', isAdmin, async (req, res) => {
+    try {
+        // Lógica para actualizar un producto
+        const productId = req.params.productId;
+        // Verificar si el usuario actual tiene permisos de administrador
+        // Hacer la actualización del producto
+        res.json({ message: 'Producto actualizado exitosamente' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error al actualizar el producto' });
+    }
+});
+
+productsRouter.get('/', async (req, res) => {
+    try {
+        // Lógica para obtener la lista de productos
+        const products = await Product.find();
+        res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error al obtener la lista de productos' });
+    }
 });
 
 module.exports = productsRouter;
