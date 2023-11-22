@@ -16,6 +16,10 @@ const daoFactory = require('./dao/daoFactory');
 const argv = require('yargs').argv;
 const express = require('express');
 const userService = require('./services/userService');
+const mockProductDAO = require('./mock/mockProductDAO');
+app.use(mockProductDAO);
+const errorHandler = require('./errorHandler');
+app.use(errorHandler);
 
 const daoType = argv.dao || 'mongo'; // Obtén el tipo de DAO desde la línea de comandos o utiliza un valor predeterminado
 const userDAO = daoFactory.createDAO(daoType);
