@@ -221,4 +221,15 @@ productsRouter.get('/', async (req, res) => {
     }
 });
 
+app.get('/products', async (req, res) => {
+    // ...
+    devLogger.debug('Obteniendo productos', {
+      route: '/products',
+    });
+    prodLogger.info('Obteniendo productos', {
+      route: '/products',
+    });
+    // ...
+  });
+
 module.exports = productsRouter;

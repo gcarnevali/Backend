@@ -17,12 +17,56 @@ const argv = require('yargs').argv;
 const express = require('express');
 const userService = require('./services/userService');
 const mockProductDAO = require('./mock/mockProductDAO');
+const winston = require('winston')
+
 app.use(mockProductDAO);
 const errorHandler = require('./errorHandler');
 app.use(errorHandler);
 
 const daoType = argv.dao || 'mongo'; // Obtén el tipo de DAO desde la línea de comandos o utiliza un valor predeterminado
 const userDAO = daoFactory.createDAO(daoType);
+
+const levels = {
+  debug: 0,
+  http: 1,
+  info: 2,
+  warning: 3,
+  error: 4,
+  fatal: 5,
+};
+
+// Logger de desarrollo
+const devLogger = winston.createLogger({
+  level: levels.debug,
+  transports: [
+    new winston.transports.Console(),
+  ],
+});
+
+console.log = devLogger.log;
+
+// Logger de producción
+const prodLogger = winston.createLogger({
+  level: levels.info,
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({
+      filename: 'errors.log',
+    }),
+  ],
+});
+
+app.get('/loggerTest', (req, res) => {
+  // ...
+  devLogger.debug('Log de debug');
+  devLogger.http('Log de http');
+  devLogger.info('Log de info');
+  devLogger.warning('Log de warning');
+  devLogger.error('Log de error');
+  devLogger.fatal('Log de fatal');
+  // ...
+});
+
 
 passport.use(new LocalStrategy(
   function (username, password, done) {

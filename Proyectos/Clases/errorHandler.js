@@ -3,6 +3,8 @@ function errorHandler(err) {
     const statusCode = err.statusCode || 500;
     const message = errorDictionary[err.message] || 'Error interno del servidor';
     res.status(statusCode).json({ message });
+
+    prodLogger.error(err)
   }
 
   const errorDictionary = {
