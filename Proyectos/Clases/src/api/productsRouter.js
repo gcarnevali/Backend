@@ -20,6 +20,8 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
+
+
 // Ruta para el dashboard (protegida por el middleware)
 productsRouter.get('/dashboard', ensureAuthenticated, (req, res) => {
     res.render('dashboard');

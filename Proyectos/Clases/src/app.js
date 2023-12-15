@@ -14,7 +14,6 @@ const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
 const daoFactory = require('./dao/daoFactory');
 const argv = require('yargs').argv;
-const express = require('express');
 const userService = require('./services/userService');
 const mockProductDAO = require('./mock/mockProductDAO');
 const winston = require('winston')
@@ -22,6 +21,96 @@ const winston = require('winston')
 app.use(mockProductDAO);
 const errorHandler = require('./errorHandler');
 app.use(errorHandler);
+
+const swagger = new swaggerJsdoc.Swagger({
+  info: {
+    title: 'Mi API',
+    version: '1.0.0',
+    description: 'Esta es la documentación de mi API',
+  },
+  components: {
+    securitySchemes: {
+      token: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+    },
+  },
+});
+
+swagger.apis.add({
+  path: '/api/products',
+  description: 'Obtiene una lista de productos',
+  parameters: [
+    {
+      name: 'page',
+      in: 'query',
+      type: 'integer',
+      required: false,
+      description: 'Página a consultar',
+    },
+    {
+      name: 'perPage',
+      in: 'query',
+      type: 'integer',
+      required: false,
+      description: 'Cantidad de productos por página',
+    },
+  ],
+  responses: {
+    200: {
+      description: 'Lista de productos',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            price: { type: 'number' },
+          },
+        },
+      },
+    },
+  },
+});
+
+swagger.apis.add({
+  path: '/api/carts',
+  description: 'Obtiene la información del carrito de un usuario',
+  parameters: [
+    {
+      name: 'userId',
+      in: 'query',
+      type: 'integer',
+      required: true,
+      description: 'ID del usuario',
+    },
+  ],
+  responses: {
+    200: {
+      description: 'Información del carrito',
+      schema: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          items: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'integer' },
+                productId: { type: 'integer' },
+                quantity: { type: 'integer' },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+});
 
 const daoType = argv.dao || 'mongo'; // Obtén el tipo de DAO desde la línea de comandos o utiliza un valor predeterminado
 const userDAO = daoFactory.createDAO(daoType);
