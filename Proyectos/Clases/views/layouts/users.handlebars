@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Usuarios</title>
+</head>
+<body>
+  <h1>Usuarios</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+      <tr>
+        <td>{{user.name}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.role}}</td>
+        <td>
+          <a href="/users/{{user.id}}/edit">Editar</a>
+          |
+          <a href="/users/{{user.id}}/delete">Eliminar</a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <a href="/">Volver al inicio</a>
+</body>
+</html>

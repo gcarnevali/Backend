@@ -22,6 +22,25 @@ app.use(mockProductDAO);
 const errorHandler = require('./errorHandler');
 app.use(errorHandler);
 
+function sendProductDeletionEmail(productId, userId) {
+  // Obtén el usuario premium
+  const user = User.findById(userId);
+
+  // Si el usuario existe
+  if (user) {
+    // Envía un correo electrónico al usuario
+    const email = mail.info({
+      to: user.email,
+      subject: 'Producto eliminado',
+      text: `El producto con ID ${productId} ha sido eliminado.`,
+    });
+
+    email.send();
+  }
+}
+
+
+
 const swagger = new swaggerJsdoc.Swagger({
   info: {
     title: 'Mi API',
@@ -306,6 +325,13 @@ app.delete('/api/products/:productId', async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Error al eliminar el producto' });
   }
+
+    // Si el producto pertenece a un usuario premium
+if (product.user && product.user.role === 'premium') {
+  // Envía un correo electrónico al usuario
+  sendProductDeletionEmail(product.id, product.user.id);
+}
+
 });
 
 app.put('/api/products/:productId', async (req, res) => {
@@ -336,6 +362,49 @@ app.get('/users/:userId', async (req, res) => {
   const userId = req.params.userId;
   const user = await userService.getUserById(userId);
   res.json(user);
+});
+
+//app.get('/api/users)
+app.get('/api/users', async (req, res) => {
+  try {
+    // Obtén todos los usuarios de la base de datos
+    const users = await User.find();
+
+    // Crea un array de objetos DTO con los datos de los usuarios
+    const usersDTO = users.map(user => createUserDTO(user));
+
+    // Envía una respuesta con los usuarios DTO
+    res.json(usersDTO);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al obtener los usuarios' });
+  }
+});
+
+app.delete('/api/users', async (req, res) => {
+  try {
+    // Obtén la fecha actual
+    const today = new Date();
+
+    // Obtén todos los usuarios que no se han conectado desde hace más de dos días
+    const inactiveUsers = await User.find({
+      lastLogin: { $lt: today.getTime() - 86400000 },
+    });
+
+    // Envía un correo electrónico a cada usuario inactivo
+    inactiveUsers.forEach(user => {
+      // Envía el correo electrónico
+    });
+
+    // Elimina a todos los usuarios inactivos
+    await inactiveUsers.deleteMany();
+
+    // Envía una respuesta con éxito
+    res.status(200).json({ message: 'Usuarios inactivos eliminados' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al eliminar los usuarios inactivos' });
+  }
 });
 
 // Inicia el servidor HTTP

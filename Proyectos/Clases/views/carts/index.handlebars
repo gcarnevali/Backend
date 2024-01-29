@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Carrito de compras</title>
+</head>
+<body>
+  <h1>Carrito de compras</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Precio</th>
+        <th>Cantidad</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products}}
+      <tr>
+        <td>{{product.name}}</td>
+        <td>{{product.price}}</td>
+        <td>{{product.quantity}}</td>
+        <td>{{product.price * product.quantity}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <a href="/cart/addProduct">Agregar producto</a>
+  <a href="/cart/removeProduct">Eliminar producto</a>
+  <a href="/cart/checkout">Realizar el pago</a>
+</body>
+</html>
